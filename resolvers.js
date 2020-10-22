@@ -1,30 +1,32 @@
+import { serializeInputValue } from 'graphql-tools';
+import courseModel from './models/course';
+
 const mongoose = require('mongoose');
-const courseModel = require('./models/course');
 
 const courseData = [
     {
         id: '1',
-        title: 'The complete node js dev veloper course',
+        title: 'The complete node js developer course',
         author: 'Yuriy Puris',
-        description: 'Lear node',
+        description: 'Learn node',
         topic: 'node js',
         url: 'https://codingthesmartway.com/courses/nodejs/',
         voteCount: 0
     },
     {
         id: '2',
-        title: 'The complete angular js dev veloper course',
+        title: 'The complete angular js developer course',
         author: 'Yuriy Puris',
-        description: 'Lear angular',
+        description: 'Learn angular',
         topic: 'node js',
         url: 'https://codingthesmartway.com/courses/nodejs-express-mongodb/',
         voteCount: 0
     },
     {
         id: '3',
-        title: 'The complete js dev veloper course',
+        title: 'The complete js developer course',
         author: 'Yuriy Puris',
-        description: 'Lear js',
+        description: 'Learn js',
         topic: 'node js',
         url: 'https://codingthesmartway.com/courses/understand-javascript/',
         voteCount: 0
@@ -34,32 +36,32 @@ const courseData = [
 const resolvers = {
     Query: {
         allCourses: (root, { searchTerm }) => {
-            return courseData;
+            if ( searchTerm !== '' ) {
+                return courseModel.find({ $text: { $search: searchTerm } }).sort({ voteCount: 'desc' });
+            } else {
+                return courseModel.find().sort({ voteCount: 'desc' });
+            }
         },
         course: (root, { id }) => {
-            return courseData.filter(course => {
-                return course.id === id;
-            })[0];
-            // return courseModel.findOne({ id: id });
+            return courseModel.findOne({ id: id });
         }
     },
     Mutation: {
         upvote: (root, { id }) => {
-            const course = courseData.filter(course => {
-                return course.id === id;
-            })[0];
-            course.voteCount++;
-            return course;
+            return courseModel.findOneAndUpdate({ id: id }, { $inc: { "voteCount": 1 } }, { returnNewDocument: true });
         },
         downvote: (root, { id }) => {
-            const course = courseData.filter(course => {
-                return course.id === id;
-            })[0];
-            course.voteCount--;
-            return course;
+            return courseModel.findOneAndUpdate({ id: id }, { $inc: { "voteCount": -1 } }, { returnNewDocument: true });
         },
         addCourse: (root, { title, author, description, topic, url }) => {
-            return null;
+            const course = new courseModel({ 
+                title: title, 
+                author: author, 
+                description: description,
+                topic: topic,
+                url: url
+            });
+            return course.save();
         }
     }
 };

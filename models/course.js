@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
+const uuid = require('uuid');
 
 const Schema = mongoose.Schema;
 
 const courseSchema = new Schema({
-    id: String,
+    id: { type: String, default: uuid.v1},
     title: String,
     author: String,
     description: String,
