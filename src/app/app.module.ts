@@ -7,10 +7,12 @@ import { InMemoryCache } from "apollo-cache-inmemory";
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { ListComponent } from './list/list.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ListComponent
   ],
   imports: [
     BrowserModule,
@@ -25,7 +27,7 @@ import { AppComponent } from './app.component';
         return {
           cache: new InMemoryCache(),
           link: httpLink.create({
-            uri: 'http://localhost:3000',
+            uri: 'http://localhost:4000/graphql',
           }),
         };
       },
